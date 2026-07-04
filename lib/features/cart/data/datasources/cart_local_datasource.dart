@@ -14,12 +14,22 @@ class CartLocalDataSource {
   static const String _boxName = 'cart_box';
 
   Box<CartItemModel>? _box;
+  bool _initialized = false;
 
   CartLocalDataSource();
 
+  /// Initializes the Hive box. Must be called before any other operation.
+  Future<void> init() async {
+    _box = await Hive.openBox<CartItemModel>(_boxName);
+    _initialized = true;
+  }
+
   /// Ensures the Hive box is open before any operation.
   Future<Box<CartItemModel>> _getBox() async {
-    _box ??= await Hive.openBox<CartItemModel>(_boxName);
+    if (!_initialized) {
+      _box = await Hive.openBox<CartItemModel>(_boxName);
+      _initialized = true;
+    }
     return _box!;
   }
 
@@ -46,17 +56,17 @@ class CartLocalDataSource {
   /// Retrieves all cart items from the local store.
   ///
   /// Returns a list of [CartItemEntity] reconstructed from stored data.
+  /// Must only be called after [init] has been executed.
   List<CartItemEntity> getCartItems() {
-    try {
-      final box = Hive.box<CartItemModel>(_boxName);
-      if (box.values.isEmpty) return [];
-
-      return box.values.map((model) => model.toEntity()).toList();
-    } catch (e) {
+    if (!_initialized) {
       throw CacheException(
-        message: 'Failed to get cart items: ${e.toString()}',
+        message: 'Cart box not initialized. Call init() first.',
       );
     }
+    final box = _box!;
+    if (box.values.isEmpty) return [];
+
+    return box.values.map((model) => model.toEntity()).toList();
   }
 
   /// Clears all items from the cart.

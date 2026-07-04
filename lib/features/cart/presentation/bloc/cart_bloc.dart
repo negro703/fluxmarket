@@ -6,13 +6,15 @@ import '../../domain/usecases/add_to_cart_usecase.dart';
 import '../../domain/usecases/clear_cart_usecase.dart';
 import '../../domain/usecases/get_cart_items_usecase.dart';
 import '../../domain/usecases/remove_from_cart_usecase.dart';
+import '../../domain/usecases/update_quantity_usecase.dart';
 import 'cart_event.dart';
 import 'cart_state.dart';
 
 /// BLoC that manages the shopping cart state.
 ///
 /// Handles [AddToCartEvent], [RemoveFromCartEvent], [DecrementQuantityEvent],
-/// [LoadCartEvent], and [ClearCartEvent] to manage the cart lifecycle.
+/// [UpdateQuantityEvent], [LoadCartEvent], and [ClearCartEvent] to manage
+/// the cart lifecycle.
 /// Computes subtotal, tax (8%), and total for the [CartLoaded] state.
 @LazySingleton()
 class CartBloc extends Bloc<CartEvent, CartState> {
@@ -20,6 +22,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   final RemoveFromCartUseCase _removeFromCartUseCase;
   final GetCartItemsUseCase _getCartItemsUseCase;
   final ClearCartUseCase _clearCartUseCase;
+  final UpdateQuantityUseCase _updateQuantityUseCase;
 
   static const double _taxRate = 0.08;
 
@@ -28,11 +31,13 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     this._removeFromCartUseCase,
     this._getCartItemsUseCase,
     this._clearCartUseCase,
+    this._updateQuantityUseCase,
   ) : super(const CartState.initial()) {
     on<LoadCartEvent>(_onLoadCart);
     on<AddToCartEvent>(_onAddToCart);
     on<RemoveFromCartEvent>(_onRemoveFromCart);
     on<DecrementQuantityEvent>(_onDecrementQuantity);
+    on<UpdateQuantityEvent>(_onUpdateQuantity);
     on<ClearCartEvent>(_onClearCart);
   }
 
@@ -86,25 +91,39 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     DecrementQuantityEvent event,
     Emitter<CartState> emit,
   ) async {
-    // Don't show loading for quick decrement operations
-    final currentState = state;
-    if (currentState is CartLoaded) {
-      // Optimistic update
-      final updatedItems = currentState.items.map((item) {
-        if (item.product.id == event.productId) {
-          if (item.quantity <= 1) return null; // Will be removed
-          return item.copyWith(quantity: item.quantity - 1);
-        }
-        return item;
-      }).whereType<CartItemEntity>().toList();
+    try {
+      final currentItems = await _removeFromCartUseCase(
+        RemoveFromCartParams(productId: event.productId),
+      );
 
-      _emitCartState(emit, updatedItems);
+      currentItems.fold(
+        (failure) => emit(CartState.error(message: failure.message)),
+        (items) => _emitCartState(emit, items),
+      );
+    } catch (e) {
+      emit(CartState.error(message: e.toString()));
     }
+  }
 
-    // Persist the change
-    await _removeFromCartUseCase(
-      RemoveFromCartParams(productId: event.productId),
-    );
+  Future<void> _onUpdateQuantity(
+    UpdateQuantityEvent event,
+    Emitter<CartState> emit,
+  ) async {
+    try {
+      final currentItems = await _updateQuantityUseCase(
+        UpdateQuantityParams(
+          productId: event.productId,
+          newQuantity: event.newQuantity,
+        ),
+      );
+
+      currentItems.fold(
+        (failure) => emit(CartState.error(message: failure.message)),
+        (items) => _emitCartState(emit, items),
+      );
+    } catch (e) {
+      emit(CartState.error(message: e.toString()));
+    }
   }
 
   Future<void> _onClearCart(

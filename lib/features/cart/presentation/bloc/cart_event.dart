@@ -45,6 +45,20 @@ class DecrementQuantityEvent extends CartEvent {
   List<Object?> get props => [productId];
 }
 
+/// Event triggered to update the quantity of an item to a specific value.
+class UpdateQuantityEvent extends CartEvent {
+  final int productId;
+  final int newQuantity;
+
+  const UpdateQuantityEvent({
+    required this.productId,
+    required this.newQuantity,
+  });
+
+  @override
+  List<Object?> get props => [productId, newQuantity];
+}
+
 /// Event triggered to clear the entire cart.
 class ClearCartEvent extends CartEvent {
   const ClearCartEvent();

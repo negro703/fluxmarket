@@ -56,7 +56,7 @@ class CartRepositoryImpl implements CartRepository {
     }
   }
 
-  @override
+@override
   Future<Either<Failure, List<CartItemEntity>>> decrementQuantity({
     required int productId,
   }) async {
@@ -74,6 +74,35 @@ class CartRepositoryImpl implements CartRepository {
         } else {
           currentItems[existingIndex] = existing.copyWith(
             quantity: existing.quantity - 1,
+          );
+        }
+      }
+
+      await _localDataSource.saveCartItems(currentItems);
+      return Right(currentItems);
+    } on Exception catch (e) {
+      return Left(_mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<CartItemEntity>>> updateQuantity({
+    required int productId,
+    required int newQuantity,
+  }) async {
+    try {
+      final currentItems = _localDataSource.getCartItems();
+      final existingIndex = currentItems.indexWhere(
+        (item) => item.product.id == productId,
+      );
+
+      if (existingIndex >= 0) {
+        if (newQuantity <= 0) {
+          // Remove if quantity would reach 0 or less
+          currentItems.removeAt(existingIndex);
+        } else {
+          currentItems[existingIndex] = currentItems[existingIndex].copyWith(
+            quantity: newQuantity,
           );
         }
       }

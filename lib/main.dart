@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluxmarket/core/theme/app_theme.dart';
+import 'package:fluxmarket/core/widgets/splash_screen.dart';
 import 'package:fluxmarket/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:fluxmarket/features/cart/presentation/bloc/cart_bloc.dart';
 import 'package:fluxmarket/features/home/presentation/bloc/home_bloc.dart';
@@ -34,7 +35,7 @@ class FluxMarketApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.light,
-        home: const HomePage(),
+        home: SplashScreen(nextPage: const HomePage()),
       ),
     );
   }

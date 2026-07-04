@@ -25,6 +25,13 @@ abstract class CartRepository {
     required int productId,
   });
 
+  /// Updates the quantity of a product to a specific value.
+  /// If newQuantity is 0 or less, removes the item from the cart.
+  Future<Either<Failure, List<CartItemEntity>>> updateQuantity({
+    required int productId,
+    required int newQuantity,
+  });
+
   /// Returns all items currently in the cart.
   Future<Either<Failure, List<CartItemEntity>>> getCartItems();
 

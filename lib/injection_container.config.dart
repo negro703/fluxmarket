@@ -30,6 +30,7 @@ import 'features/cart/domain/usecases/add_to_cart_usecase.dart' as _i187;
 import 'features/cart/domain/usecases/clear_cart_usecase.dart' as _i97;
 import 'features/cart/domain/usecases/get_cart_items_usecase.dart' as _i403;
 import 'features/cart/domain/usecases/remove_from_cart_usecase.dart' as _i192;
+import 'features/cart/domain/usecases/update_quantity_usecase.dart' as _i796;
 import 'features/cart/presentation/bloc/cart_bloc.dart' as _i239;
 import 'features/home/data/datasources/home_remote_datasource.dart' as _i400;
 import 'features/home/data/repositories/home_repository_impl.dart' as _i689;
@@ -71,6 +72,9 @@ _i174.GetIt $initGetIt(
   gh.lazySingleton<_i192.RemoveFromCartUseCase>(
     () => _i192.RemoveFromCartUseCase(gh<_i303.CartRepository>()),
   );
+  gh.lazySingleton<_i796.UpdateQuantityUseCase>(
+    () => _i796.UpdateQuantityUseCase(gh<_i303.CartRepository>()),
+  );
   gh.lazySingleton<_i75.NetworkInfo>(
     () => _i75.NetworkInfoImpl(gh<_i895.Connectivity>()),
   );
@@ -83,6 +87,7 @@ _i174.GetIt $initGetIt(
       gh<_i192.RemoveFromCartUseCase>(),
       gh<_i403.GetCartItemsUseCase>(),
       gh<_i97.ClearCartUseCase>(),
+      gh<_i796.UpdateQuantityUseCase>(),
     ),
   );
   gh.lazySingleton<_i222.GetProductsUseCase>(

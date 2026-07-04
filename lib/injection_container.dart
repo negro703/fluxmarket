@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'features/cart/data/datasources/cart_local_datasource.dart';
 import 'features/cart/data/models/cart_item_model.dart';
 import 'injection_container.config.dart';
 
@@ -36,6 +37,9 @@ Future<void> configureDependencies({String? env}) async {
 
   // ── Run generated injectable registrations ────────────────────────
   $initGetIt(sl, environment: env);
+
+  // ── Initialize Cart Local Data Source (opens the Hive box) ──────────
+  await sl<CartLocalDataSource>().init();
 }
 
 /// Creates and configures the [Dio] HTTP client with production-ready settings.

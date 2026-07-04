@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/widgets/app_error_widget.dart';
+import '../../../home/presentation/pages/home_page.dart';
 import '../../domain/entities/cart_item_entity.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_event.dart';
@@ -176,7 +177,10 @@ class _CartEmptyViewState extends State<_CartEmptyView>
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                // TODO: Navigate to home/products page
+                // Navigate to HomePage using pushReplacement to clear navigation stack
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const HomePage()),
+                );
               },
               icon: const Icon(Icons.explore_rounded),
               label: const Text('Start Shopping'),
@@ -246,9 +250,19 @@ class _CartLoadedView extends StatelessWidget {
                   );
                 },
                 onDecrement: () {
-                  context.read<CartBloc>().add(
-                    DecrementQuantityEvent(productId: item.product.id),
-                  );
+                  // If quantity > 1, decrement; otherwise remove the item
+                  if (item.quantity > 1) {
+                    context.read<CartBloc>().add(
+                      UpdateQuantityEvent(
+                        productId: item.product.id,
+                        newQuantity: item.quantity - 1,
+                      ),
+                    );
+                  } else {
+                    context.read<CartBloc>().add(
+                      RemoveFromCartEvent(productId: item.product.id),
+                    );
+                  }
                 },
                 onRemove: () {
                   context.read<CartBloc>().add(
