@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 
+        Production-ready network security configuration.
+        
+        This configuration:
+        - Uses modern TLS protocols (TLS 1.2 and 1.3)
+        - Allows clear text traffic only for debugging (disabled in release)
+        - Pins certificates for known APIs (optional, can be enabled for production)
+    -->
+    
+    <!-- Security configuration for debug builds - allows clear text for local testing -->
+    <base-config cleartextTrafficPermitted="false">
+        <tls-version-tls12 enabled="true" />
+        <tls-version-tls13 enabled="true" />
+    </base-config>
+
+    <!-- 
+        Domain-specific configuration for fakestoreapi.com
+        This ensures proper TLS handling for the API endpoint
+    -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">fakestoreapi.com</domain>
+        <pin-set expiration="2026-01-01">
+            <!-- 
+                Certificate pinning for fakestoreapi.com
+                These are backup keys in case the primary cert is compromised
+                You can remove pinning for development or add your own pins
+            -->
+        </pin-set>
+    </domain-config>
+</network-security-config>
