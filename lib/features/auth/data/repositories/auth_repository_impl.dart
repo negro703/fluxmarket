@@ -75,7 +75,10 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       // Try remote first
       final userModel = await _remoteDataSource.getCurrentUser();
-      await _localDataSource.cacheUser(userModel);
+      // Only cache if user exists
+      if (userModel != null) {
+        await _localDataSource.cacheUser(userModel);
+      }
       return Right(userModel);
     } on Exception {
       // Fall back to cached user

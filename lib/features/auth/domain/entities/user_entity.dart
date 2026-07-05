@@ -18,6 +18,32 @@ class UserEntity extends Equatable {
     this.createdAt,
   });
 
+  /// Creates a new [UserEntity] with the given fields replaced.
+  UserEntity copyWith({
+    String? id,
+    String? email,
+    String? fullName,
+    String? phoneNumber,
+    String? avatarUrl,
+    DateTime? createdAt,
+  }) {
+    return UserEntity(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   @override
-  List<Object?> get props => [id, email, fullName, phoneNumber, avatarUrl, createdAt];
+  List<Object?> get props => [
+    id,
+    email,
+    fullName,
+    phoneNumber,
+    avatarUrl,
+    createdAt,
+  ];
 }

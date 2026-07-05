@@ -10,10 +10,7 @@ class LoginParams {
   final String email;
   final String password;
 
-  const LoginParams({
-    required this.email,
-    required this.password,
-  });
+  const LoginParams({required this.email, required this.password});
 }
 
 /// Use case for authenticating a user with email and password.
@@ -30,9 +27,6 @@ class LoginUseCase {
   ///
   /// Returns a [UserEntity] on success or a [Failure] on error.
   Future<Either<Failure, UserEntity>> call(LoginParams params) {
-    return _repository.login(
-      email: params.email,
-      password: params.password,
-    );
+    return _repository.login(email: params.email, password: params.password);
   }
 }

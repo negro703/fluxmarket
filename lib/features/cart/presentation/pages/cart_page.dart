@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/widgets/app_error_widget.dart';
+import '../../../checkout/presentation/bloc/checkout_bloc.dart';
+import '../../../checkout/presentation/bloc/checkout_event.dart';
+import '../../../checkout/presentation/pages/cash_on_delivery_page.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../domain/entities/cart_item_entity.dart';
 import '../bloc/cart_bloc.dart';
@@ -50,7 +53,9 @@ class CartPage extends StatelessWidget {
                 total: total,
               ),
             CartEmpty() => const _CartEmptyView(),
-            CartError(message: final message) => _CartErrorView(message: message),
+            CartError(message: final message) => _CartErrorView(
+              message: message,
+            ),
           };
         },
       ),
@@ -112,9 +117,10 @@ class _CartEmptyViewState extends State<_CartEmptyView>
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
-    _bounceAnimation = Tween<double>(begin: 0.0, end: 0.08).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _bounceAnimation = Tween<double>(
+      begin: 0.0,
+      end: 0.08,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -223,6 +229,29 @@ class _CartLoadedView extends StatelessWidget {
     required this.total,
   });
 
+  void _navigateToCheckout(BuildContext context) {
+    // Initialize checkout and navigate
+    context.read<CheckoutBloc>().add(
+      InitializeCheckoutEvent(
+        items: items,
+        subtotal: subtotal,
+        tax: tax,
+        total: total,
+      ),
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CashOnDeliveryPage(
+          items: items,
+          subtotal: subtotal,
+          tax: tax,
+          total: total,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -242,10 +271,7 @@ class _CartLoadedView extends StatelessWidget {
                 onIncrement: () {
                   context.read<CartBloc>().add(
                     AddToCartEvent(
-                      item: CartItemEntity(
-                        product: item.product,
-                        quantity: 1,
-                      ),
+                      item: CartItemEntity(product: item.product, quantity: 1),
                     ),
                   );
                 },
@@ -292,9 +318,15 @@ class _CartLoadedView extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  _SummaryRow(label: 'Subtotal', value: '\$${subtotal.toStringAsFixed(2)}'),
+                  _SummaryRow(
+                    label: 'Subtotal',
+                    value: '\$${subtotal.toStringAsFixed(2)}',
+                  ),
                   const SizedBox(height: 8),
-                  _SummaryRow(label: 'Tax (8%)', value: '\$${tax.toStringAsFixed(2)}'),
+                  _SummaryRow(
+                    label: 'Tax (8%)',
+                    value: '\$${tax.toStringAsFixed(2)}',
+                  ),
                   const SizedBox(height: 8),
                   const Divider(),
                   const SizedBox(height: 8),
@@ -323,12 +355,8 @@ class _CartLoadedView extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Checkout coming soon!')),
-                        );
-                      },
-                      icon: const Icon(Icons.lock_outlined),
+                      onPressed: () => _navigateToCheckout(context),
+                      icon: const Icon(Icons.payment_rounded),
                       label: Text('Checkout — \$${total.toStringAsFixed(2)}'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -420,7 +448,10 @@ class _CartItemCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      _QuantityButton(icon: Icons.remove_rounded, onTap: onDecrement),
+                      _QuantityButton(
+                        icon: Icons.remove_rounded,
+                        onTap: onDecrement,
+                      ),
                       const SizedBox(width: 12),
                       Text(
                         '${item.quantity}',
@@ -431,7 +462,10 @@ class _CartItemCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      _QuantityButton(icon: Icons.add_rounded, onTap: onIncrement),
+                      _QuantityButton(
+                        icon: Icons.add_rounded,
+                        onTap: onIncrement,
+                      ),
                     ],
                   ),
                 ],

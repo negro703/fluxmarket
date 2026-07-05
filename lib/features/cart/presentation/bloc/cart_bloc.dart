@@ -41,10 +41,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<ClearCartEvent>(_onClearCart);
   }
 
-  Future<void> _onLoadCart(
-    LoadCartEvent event,
-    Emitter<CartState> emit,
-  ) async {
+  Future<void> _onLoadCart(LoadCartEvent event, Emitter<CartState> emit) async {
     emit(const CartState.loading());
 
     final result = await _getCartItemsUseCase();
@@ -61,9 +58,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   ) async {
     emit(const CartState.loading());
 
-    final result = await _addToCartUseCase(
-      AddToCartParams(item: event.item),
-    );
+    final result = await _addToCartUseCase(AddToCartParams(item: event.item));
 
     result.fold(
       (failure) => emit(CartState.error(message: failure.message)),
@@ -155,11 +150,13 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     final tax = subtotal * _taxRate;
     final total = subtotal + tax;
 
-    emit(CartState.loaded(
-      items: items,
-      subtotal: subtotal,
-      tax: tax,
-      total: total,
-    ));
+    emit(
+      CartState.loaded(
+        items: items,
+        subtotal: subtotal,
+        tax: tax,
+        total: total,
+      ),
+    );
   }
 }

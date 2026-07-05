@@ -23,7 +23,9 @@ class UpdateQuantityUseCase {
 
   UpdateQuantityUseCase(this._repository);
 
-  Future<Either<Failure, List<CartItemEntity>>> call(UpdateQuantityParams params) {
+  Future<Either<Failure, List<CartItemEntity>>> call(
+    UpdateQuantityParams params,
+  ) {
     return _repository.updateQuantity(
       productId: params.productId,
       newQuantity: params.newQuantity,

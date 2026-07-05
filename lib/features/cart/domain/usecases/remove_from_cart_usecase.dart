@@ -20,7 +20,8 @@ class RemoveFromCartUseCase {
   RemoveFromCartUseCase(this._repository);
 
   Future<Either<Failure, List<CartItemEntity>>> call(
-      RemoveFromCartParams params) {
+    RemoveFromCartParams params,
+  ) {
     return _repository.removeFromCart(productId: params.productId);
   }
 }

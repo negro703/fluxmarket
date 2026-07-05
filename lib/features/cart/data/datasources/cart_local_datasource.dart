@@ -75,9 +75,7 @@ class CartLocalDataSource {
       final box = await _getBox();
       await box.clear();
     } catch (e) {
-      throw CacheException(
-        message: 'Failed to clear cart: ${e.toString()}',
-      );
+      throw CacheException(message: 'Failed to clear cart: ${e.toString()}');
     }
   }
 }

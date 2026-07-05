@@ -20,10 +20,7 @@ abstract class Failure {
 
 /// Failure returned when a server/API error occurs.
 class ServerFailure extends Failure {
-  const ServerFailure({
-    required super.message,
-    super.statusCode,
-  });
+  const ServerFailure({required super.message, super.statusCode});
 
   factory ServerFailure.fromDioError({
     required String message,
@@ -35,18 +32,21 @@ class ServerFailure extends Failure {
 
 /// Failure returned when a local cache/storage error occurs.
 class CacheFailure extends Failure {
-  const CacheFailure({
-    required super.message,
-    super.statusCode,
-  });
+  const CacheFailure({required super.message, super.statusCode});
 }
 
 /// Failure returned when there is no network connection.
 class NetworkFailure extends Failure {
-  const NetworkFailure({super.message = 'No internet connection', super.statusCode});
+  const NetworkFailure({
+    super.message = 'No internet connection',
+    super.statusCode,
+  });
 }
 
 /// Failure returned for unexpected/unknown errors.
 class UnknownFailure extends Failure {
-  const UnknownFailure({super.message = 'An unexpected error occurred', super.statusCode});
+  const UnknownFailure({
+    super.message = 'An unexpected error occurred',
+    super.statusCode,
+  });
 }

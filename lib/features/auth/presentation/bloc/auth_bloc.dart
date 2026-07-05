@@ -17,11 +17,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase _registerUseCase;
   final AuthRepository _authRepository;
 
-  AuthBloc(
-    this._loginUseCase,
-    this._registerUseCase,
-    this._authRepository,
-  ) : super(const AuthInitial()) {
+  AuthBloc(this._loginUseCase, this._registerUseCase, this._authRepository)
+    : super(const AuthInitial()) {
     on<LoginEvent>(_onLogin);
     on<RegisterEvent>(_onRegister);
     on<LogoutEvent>(_onLogout);
@@ -83,16 +80,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (isAuthenticated) {
       final result = await _authRepository.getCurrentUser();
 
-      result.fold(
-        (failure) => emit(const AuthInitial()),
-        (user) {
-          if (user != null) {
-            emit(AuthSuccess(user: user));
-          } else {
-            emit(const AuthInitial());
-          }
-        },
-      );
+      result.fold((failure) => emit(const AuthInitial()), (user) {
+        if (user != null) {
+          emit(AuthSuccess(user: user));
+        } else {
+          emit(const AuthInitial());
+        }
+      });
     } else {
       emit(const AuthInitial());
     }

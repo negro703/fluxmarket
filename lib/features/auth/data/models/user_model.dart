@@ -23,13 +23,14 @@ class UserModel extends UserEntity {
       id: json['id'] as String,
       email: json['email'] as String,
       fullName: json['fullName'] as String? ?? json['full_name'] as String,
-      phoneNumber: json['phoneNumber'] as String? ?? json['phone_number'] as String?,
+      phoneNumber:
+          json['phoneNumber'] as String? ?? json['phone_number'] as String?,
       avatarUrl: json['avatarUrl'] as String? ?? json['avatar_url'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : json['created_at'] != null
-              ? DateTime.parse(json['created_at'] as String)
-              : null,
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
     );
   }
 

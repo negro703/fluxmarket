@@ -54,10 +54,7 @@ class ProductModel extends ProductEntity {
       'description': description,
       'category': category,
       'image': image,
-      'rating': {
-        'rate': ratingRate,
-        'count': ratingCount,
-      },
+      'rating': {'rate': ratingRate, 'count': ratingCount},
     };
   }
 }

@@ -11,10 +11,7 @@ class CartItemModel {
   final int quantity;
   final Map<String, dynamic> productData;
 
-  CartItemModel({
-    required this.quantity,
-    required this.productData,
-  });
+  CartItemModel({required this.quantity, required this.productData});
 
   /// Creates a [CartItemModel] from a [CartItemEntity].
   factory CartItemModel.fromEntity(CartItemEntity entity) {

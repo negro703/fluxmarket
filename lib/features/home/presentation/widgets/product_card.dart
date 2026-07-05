@@ -11,11 +11,7 @@ class ProductCard extends StatelessWidget {
   final ProductEntity product;
   final VoidCallback? onTap;
 
-  const ProductCard({
-    super.key,
-    required this.product,
-    this.onTap,
-  });
+  const ProductCard({super.key, required this.product, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +121,9 @@ class ProductCard extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
-                              color: colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
                             ),
                           ),
                           if (product.ratingCount != null) ...[
@@ -134,7 +132,9 @@ class ProductCard extends StatelessWidget {
                               '(${product.ratingCount})',
                               style: GoogleFonts.poppins(
                                 fontSize: 10,
-                                color: colorScheme.onSurface.withValues(alpha: 0.4),
+                                color: colorScheme.onSurface.withValues(
+                                  alpha: 0.4,
+                                ),
                               ),
                             ),
                           ],

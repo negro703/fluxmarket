@@ -56,10 +56,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     // Dispatch AddToCartEvent to CartBloc
     context.read<CartBloc>().add(
       AddToCartEvent(
-        item: CartItemEntity(
-          product: widget.product,
-          quantity: _quantity,
-        ),
+        item: CartItemEntity(product: widget.product, quantity: _quantity),
       ),
     );
 
@@ -89,9 +86,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     final product = widget.product;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Product Details'),
-      ),
+      appBar: AppBar(title: const Text('Product Details')),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,8 +188,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                             '(${product.ratingCount} reviews)',
                             style: GoogleFonts.poppins(
                               fontSize: 14,
-                              color: colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -246,10 +242,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                             color: colorScheme.primary,
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            Icons.add_rounded,
-                            color: Colors.white,
-                          ),
+                          child: Icon(Icons.add_rounded, color: Colors.white),
                         ),
                       ),
                     ],

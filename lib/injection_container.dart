@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
@@ -7,39 +8,76 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'features/cart/data/datasources/cart_local_datasource.dart';
 import 'features/cart/data/models/cart_item_model.dart';
+import 'features/checkout/data/datasources/order_local_datasource.dart';
+import 'features/checkout/data/models/order_model.dart';
 import 'injection_container.config.dart';
 
 /// The global [GetIt] service locator instance.
 final GetIt sl = GetIt.instance;
 
+/// Flag to track if dependencies have been configured.
+bool _dependenciesConfigured = false;
+
 /// Initializes all dependency injections for the application.
 ///
 /// Call this before [runApp] in `main.dart`.
-/// ```
-/// await configureDependencies();
-/// runApp(const FluxMarketApp());
-/// ```
+/// This ensures all Hive adapters are registered before any dependent services.
 @InjectableInit(
   initializerName: r'$initGetIt',
   preferRelativeImports: true,
   asExtension: false,
 )
 Future<void> configureDependencies({String? env}) async {
-  // ── Initialize Hive ───────────────────────────────────────────────
-  await Hive.initFlutter();
-  Hive.registerAdapter(CartItemModelAdapter());
+  // Prevent double initialization
+  if (_dependenciesConfigured) return;
+
+  // ── Initialize Hive FIRST before any registrations ──────────────────
+  try {
+    await Hive.initFlutter();
+  } catch (e) {
+    print('Hive init error (may be ok if already initialized): $e');
+  }
+
+  // ── Register adapters - this MUST happen before $initGetIt ───────────
+  // Check if adapter is already registered before trying to register
+  if (!Hive.isAdapterRegistered(CartItemModelAdapter().typeId)) {
+    Hive.registerAdapter(CartItemModelAdapter());
+  }
+  if (!Hive.isAdapterRegistered(OrderModelAdapter().typeId)) {
+    Hive.registerAdapter(OrderModelAdapter());
+  }
 
   // ── Register core non-injectable dependencies ──────────────────────
   sl.registerLazySingleton<Dio>(() => _createDioInstance());
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
+  sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   final prefs = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => prefs);
 
-  // ── Run generated injectable registrations ────────────────────────
-  $initGetIt(sl, environment: env);
+  // ── Run generated injectable registrations ───────────────────────────
+  // This registers all BLoCs and repositories
+  try {
+    $initGetIt(sl, environment: env);
+  } catch (e, stack) {
+    print('GetIt registration error: $e');
+    print('Stack: $stack');
+    rethrow;
+  }
 
-  // ── Initialize Cart Local Data Source (opens the Hive box) ──────────
-  await sl<CartLocalDataSource>().init();
+  // ── Initialize Local Data Sources (non-blocking) ────────────────────
+  // These can fail without preventing the app from running
+  try {
+    await sl<CartLocalDataSource>().init();
+  } catch (e, st) {
+    print('Cart init error (non-fatal): $e\n$st');
+  }
+  try {
+    await sl<OrderLocalDataSource>().init();
+  } catch (e, st) {
+    print('Order init error (non-fatal): $e\n$st');
+  }
+
+  _dependenciesConfigured = true;
 }
 
 /// Creates and configures the [Dio] HTTP client with production-ready settings.
@@ -58,10 +96,7 @@ Dio _createDioInstance() {
       sendTimeout: const Duration(seconds: 30),
       contentType: 'application/json',
       responseType: ResponseType.json,
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'FluxMarket/1.0',
-      },
+      headers: {'Accept': 'application/json', 'User-Agent': 'FluxMarket/1.0'},
       // Follow redirects automatically
       followRedirects: true,
     ),
@@ -73,10 +108,13 @@ Dio _createDioInstance() {
     InterceptorsWrapper(
       onError: (error, handler) async {
         if (_shouldRetry(error)) {
-          final retryCount = error.requestOptions.extra['retryCount'] as int? ?? 0;
+          final retryCount =
+              error.requestOptions.extra['retryCount'] as int? ?? 0;
           if (retryCount < 3) {
             error.requestOptions.extra['retryCount'] = retryCount + 1;
-            await Future.delayed(Duration(milliseconds: 500 * (retryCount + 1)));
+            await Future.delayed(
+              Duration(milliseconds: 500 * (retryCount + 1)),
+            );
             try {
               final response = await dio.request(
                 error.requestOptions.path,

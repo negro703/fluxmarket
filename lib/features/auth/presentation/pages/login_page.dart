@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import '../../../../core/widgets/main_shell.dart';
 import 'register_page.dart';
 
 /// Login page where users authenticate with email and password.
@@ -31,11 +32,11 @@ class _LoginPageState extends State<LoginPage> {
   void _onLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
-            LoginEvent(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-            ),
-          );
+        LoginEvent(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -56,6 +57,13 @@ class _LoginPageState extends State<LoginPage> {
                         content: Text(state.message),
                         backgroundColor: Colors.red,
                       ),
+                    );
+                  }
+                  if (state is AuthSuccess) {
+                    // Navigate to main shell on successful login
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const MainShell()),
+                      (route) => false,
                     );
                   }
                 },
@@ -88,10 +96,9 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 48),
@@ -175,10 +182,9 @@ class _LoginPageState extends State<LoginPage> {
                             "Don't have an account? ",
                             style: GoogleFonts.poppins(
                               fontSize: 14,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.6),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                           TextButton(

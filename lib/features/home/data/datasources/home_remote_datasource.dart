@@ -17,15 +17,12 @@ class HomeRemoteDataSource {
   Future<List<ProductModel>> getProducts() async {
     try {
       // Override the base URL for FakeStore API calls
-      final response = await _dio.get(
-        'https://fakestoreapi.com/products',
-      );
+      final response = await _dio.get('https://fakestoreapi.com/products');
 
       if (response.statusCode == 200) {
         final data = response.data as List<dynamic>;
         return data
-            .map((item) =>
-                ProductModel.fromJson(item as Map<String, dynamic>))
+            .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
             .toList();
       } else {
         throw ServerException(
@@ -43,9 +40,7 @@ class HomeRemoteDataSource {
   /// Throws a [ServerException] on failure.
   Future<ProductModel> getProductById(int id) async {
     try {
-      final response = await _dio.get(
-        'https://fakestoreapi.com/products/$id',
-      );
+      final response = await _dio.get('https://fakestoreapi.com/products/$id');
 
       if (response.statusCode == 200) {
         return ProductModel.fromJson(response.data as Map<String, dynamic>);

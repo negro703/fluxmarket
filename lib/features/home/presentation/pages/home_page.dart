@@ -104,7 +104,10 @@ class _HomePageState extends State<HomePage> {
             builder: (context, state) {
               int itemCount = 0;
               if (state is CartLoaded) {
-                itemCount = state.items.fold<int>(0, (sum, item) => sum + item.quantity);
+                itemCount = state.items.fold<int>(
+                  0,
+                  (sum, item) => sum + item.quantity,
+                );
               }
               return Stack(
                 alignment: Alignment.center,
@@ -114,9 +117,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       // Navigate to cart page
                       Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CartPage(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const CartPage()),
                       );
                     },
                   ),
@@ -155,21 +156,25 @@ class _HomePageState extends State<HomePage> {
             HomeInitial() => const SizedBox.shrink(),
             HomeLoading() => const ProductGridShimmer(),
             HomeLoaded(products: final products) => _buildProductGrid(
-                context,
-                products,
-                _searchController.text,
-              ),
+              context,
+              products,
+              _searchController.text,
+            ),
             HomeError(message: final message) => _buildErrorState(
-                context,
-                message,
-              ),
+              context,
+              message,
+            ),
           };
         },
       ),
     );
   }
 
-  Widget _buildProductGrid(BuildContext context, List<ProductEntity> products, String query) {
+  Widget _buildProductGrid(
+    BuildContext context,
+    List<ProductEntity> products,
+    String query,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Apply search filter
@@ -180,8 +185,8 @@ class _HomePageState extends State<HomePage> {
     final crossAxisCount = screenWidth > 900
         ? 4
         : screenWidth > 600
-            ? 3
-            : 2;
+        ? 3
+        : 2;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -237,7 +242,8 @@ class _HomePageState extends State<HomePage> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => ProductDetailPage(product: product),
+                              builder: (_) =>
+                                  ProductDetailPage(product: product),
                             ),
                           );
                         },

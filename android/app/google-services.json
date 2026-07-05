@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "885286614679",
+    "project_id": "fluxmarket-3e6b9",
+    "storage_bucket": "fluxmarket-3e6b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:885286614679:android:fce87de6576a973d421bd2",
+        "android_client_info": {
+          "package_name": "com.example.fluxmarket"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABRYYkvKvQgpah6yNbakiT3YxmY5qwBok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

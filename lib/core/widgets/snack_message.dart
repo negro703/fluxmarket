@@ -57,7 +57,10 @@ class SnackMessage {
     final colorScheme = Theme.of(context).colorScheme;
 
     final (Color bgColor, IconData icon) = switch (type) {
-      _SnackType.success => (const Color(0xFF16A34A), Icons.check_circle_rounded),
+      _SnackType.success => (
+        const Color(0xFF16A34A),
+        Icons.check_circle_rounded,
+      ),
       _SnackType.error => (colorScheme.error, Icons.error_rounded),
       _SnackType.warning => (const Color(0xFFD97706), Icons.warning_rounded),
       _SnackType.info => (colorScheme.primary, Icons.info_rounded),

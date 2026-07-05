@@ -39,11 +39,7 @@ class AppErrorWidget extends StatelessWidget {
           children: [
             // ── Custom or default icon ──
             if (customIllustration != null)
-              SizedBox(
-                width: 120,
-                height: 120,
-                child: customIllustration,
-              )
+              SizedBox(width: 120, height: 120, child: customIllustration)
             else
               Container(
                 width: 100,
@@ -52,11 +48,7 @@ class AppErrorWidget extends StatelessWidget {
                   color: colorScheme.error.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  size: 48,
-                  color: colorScheme.error,
-                ),
+                child: Icon(icon, size: 48, color: colorScheme.error),
               ),
 
             const SizedBox(height: 24),

@@ -64,9 +64,7 @@ class AppTheme {
 
   // ── Light Theme ──────────────────────────────────────────────────────
   static ThemeData get lightTheme {
-    final textTheme = GoogleFonts.poppinsTextTheme(
-      ThemeData.light().textTheme,
-    );
+    final textTheme = GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme);
 
     return ThemeData(
       useMaterial3: true,
@@ -211,7 +209,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: _surfaceColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: _dividerColor),
@@ -263,9 +264,7 @@ class AppTheme {
 
       // ── Chip ──
       chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         side: const BorderSide(color: _dividerColor),
         labelStyle: GoogleFonts.poppins(
           fontSize: 12,
@@ -302,9 +301,7 @@ class AppTheme {
       // ── Snackbar ──
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         contentTextStyle: GoogleFonts.poppins(
           fontSize: 14,
           fontWeight: FontWeight.w400,
@@ -324,9 +321,7 @@ class AppTheme {
         backgroundColor: _primaryColor,
         foregroundColor: Colors.white,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
       // ── Progress Indicator ──
@@ -342,9 +337,7 @@ class AppTheme {
 
   // ── Dark Theme ───────────────────────────────────────────────────────
   static ThemeData get darkTheme {
-    final textTheme = GoogleFonts.poppinsTextTheme(
-      ThemeData.dark().textTheme,
-    );
+    final textTheme = GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme);
 
     return ThemeData(
       useMaterial3: true,

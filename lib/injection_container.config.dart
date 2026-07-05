@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:dio/dio.dart' as _i361;
+import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
@@ -32,11 +33,24 @@ import 'features/cart/domain/usecases/get_cart_items_usecase.dart' as _i403;
 import 'features/cart/domain/usecases/remove_from_cart_usecase.dart' as _i192;
 import 'features/cart/domain/usecases/update_quantity_usecase.dart' as _i796;
 import 'features/cart/presentation/bloc/cart_bloc.dart' as _i239;
+import 'features/checkout/data/datasources/order_local_datasource.dart'
+    as _i217;
+import 'features/checkout/data/repositories/order_repository_impl.dart'
+    as _i756;
+import 'features/checkout/domain/repositories/order_repository.dart' as _i67;
+import 'features/checkout/domain/usecases/get_orders_usecase.dart' as _i846;
+import 'features/checkout/domain/usecases/place_order_usecase.dart' as _i650;
+import 'features/checkout/presentation/bloc/checkout_bloc.dart' as _i148;
 import 'features/home/data/datasources/home_remote_datasource.dart' as _i400;
 import 'features/home/data/repositories/home_repository_impl.dart' as _i689;
 import 'features/home/domain/repositories/home_repository.dart' as _i649;
 import 'features/home/domain/usecases/get_products_usecase.dart' as _i222;
 import 'features/home/presentation/bloc/home_bloc.dart' as _i123;
+import 'features/profile/data/repositories/profile_repository_impl.dart'
+    as _i277;
+import 'features/profile/domain/repositories/profile_repository.dart' as _i626;
+import 'features/profile/domain/usecases/update_profile_usecase.dart' as _i851;
+import 'features/profile/presentation/bloc/profile_bloc.dart' as _i284;
 
 // initializes the registration of main-scope dependencies inside of GetIt
 _i174.GetIt $initGetIt(
@@ -48,11 +62,23 @@ _i174.GetIt $initGetIt(
   gh.lazySingleton<_i403.CartLocalDataSource>(
     () => _i403.CartLocalDataSource(),
   );
+  gh.lazySingleton<_i217.OrderLocalDataSource>(
+    () => _i217.OrderLocalDataSource(),
+  );
+  gh.lazySingleton<_i67.OrderRepository>(
+    () => _i756.OrderRepositoryImpl(gh<_i217.OrderLocalDataSource>()),
+  );
   gh.lazySingleton<_i303.CartRepository>(
     () => _i302.CartRepositoryImpl(gh<_i403.CartLocalDataSource>()),
   );
-  gh.lazySingleton<_i588.AuthRemoteDataSource>(
-    () => _i588.AuthRemoteDataSource(gh<_i361.Dio>()),
+  gh.lazySingleton<_i626.ProfileRepository>(
+    () => _i277.ProfileRepositoryImpl(),
+  );
+  gh.lazySingleton<_i851.UpdateProfileUseCase>(
+    () => _i851.UpdateProfileUseCase(gh<_i626.ProfileRepository>()),
+  );
+  gh.lazySingleton<_i851.ClearPreferencesUseCase>(
+    () => _i851.ClearPreferencesUseCase(gh<_i626.ProfileRepository>()),
   );
   gh.lazySingleton<_i400.HomeRemoteDataSource>(
     () => _i400.HomeRemoteDataSource(gh<_i361.Dio>()),
@@ -75,6 +101,9 @@ _i174.GetIt $initGetIt(
   gh.lazySingleton<_i796.UpdateQuantityUseCase>(
     () => _i796.UpdateQuantityUseCase(gh<_i303.CartRepository>()),
   );
+  gh.lazySingleton<_i588.AuthRemoteDataSource>(
+    () => _i588.AuthRemoteDataSource(gh<_i59.FirebaseAuth>()),
+  );
   gh.lazySingleton<_i75.NetworkInfo>(
     () => _i75.NetworkInfoImpl(gh<_i895.Connectivity>()),
   );
@@ -90,6 +119,12 @@ _i174.GetIt $initGetIt(
       gh<_i796.UpdateQuantityUseCase>(),
     ),
   );
+  gh.lazySingleton<_i846.GetOrdersUseCase>(
+    () => _i846.GetOrdersUseCase(gh<_i67.OrderRepository>()),
+  );
+  gh.lazySingleton<_i650.PlaceOrderUseCase>(
+    () => _i650.PlaceOrderUseCase(gh<_i67.OrderRepository>()),
+  );
   gh.lazySingleton<_i222.GetProductsUseCase>(
     () => _i222.GetProductsUseCase(gh<_i649.HomeRepository>()),
   );
@@ -98,6 +133,9 @@ _i174.GetIt $initGetIt(
       gh<_i588.AuthRemoteDataSource>(),
       gh<_i1043.AuthLocalDataSource>(),
     ),
+  );
+  gh.lazySingleton<_i284.ProfileBloc>(
+    () => _i284.ProfileBloc(gh<_i1015.AuthRepository>()),
   );
   gh.lazySingleton<_i206.LoginUseCase>(
     () => _i206.LoginUseCase(gh<_i1015.AuthRepository>()),
@@ -114,6 +152,12 @@ _i174.GetIt $initGetIt(
   );
   gh.lazySingleton<_i123.HomeBloc>(
     () => _i123.HomeBloc(gh<_i222.GetProductsUseCase>()),
+  );
+  gh.lazySingleton<_i148.CheckoutBloc>(
+    () => _i148.CheckoutBloc(
+      gh<_i650.PlaceOrderUseCase>(),
+      gh<_i846.GetOrdersUseCase>(),
+    ),
   );
   return getIt;
 }

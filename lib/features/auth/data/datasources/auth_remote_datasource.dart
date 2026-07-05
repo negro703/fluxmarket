@@ -1,17 +1,17 @@
-import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../models/user_model.dart';
 
-/// Remote data source for authentication API calls.
+/// Remote data source for Firebase Authentication.
 ///
-/// Handles all HTTP communication with the authentication backend.
+/// Handles all Firebase Auth operations: sign-in, sign-up, sign-out, and user management.
 @LazySingleton()
 class AuthRemoteDataSource {
-  final Dio _dio;
+  final FirebaseAuth _firebaseAuth;
 
-  AuthRemoteDataSource(this._dio);
+  AuthRemoteDataSource(this._firebaseAuth);
 
   /// Authenticates a user with [email] and [password].
   ///
@@ -21,30 +21,27 @@ class AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      final response = await _dio.post(
-        '/auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        final userData = data['user'] as Map<String, dynamic>? ?? data;
-        return UserModel.fromJson(userData);
-      } else {
-        throw ServerException(
-          message: response.data?['message'] as String? ?? 'Login failed',
-          statusCode: response.statusCode,
-        );
+      final user = credential.user;
+      if (user == null) {
+        throw const ServerException(message: 'Authentication failed');
       }
-    } on DioException catch (e) {
-      throw _handleDioException(e);
+
+      return UserModel(
+        id: user.uid,
+        email: user.email ?? '',
+        fullName: user.displayName ?? 'User',
+      );
+    } on FirebaseAuthException catch (e) {
+      throw _handleFirebaseAuthException(e);
     }
   }
 
-  /// Creates a new user account.
+  /// Creates a new user account with [email], [password], and [fullName].
   ///
   /// Throws a [ServerException] on failure.
   Future<UserModel> register({
@@ -53,91 +50,96 @@ class AuthRemoteDataSource {
     required String fullName,
   }) async {
     try {
-      final response = await _dio.post(
-        '/auth/register',
-        data: {
-          'email': email,
-          'password': password,
-          'fullName': fullName,
-        },
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data as Map<String, dynamic>;
-        final userData = data['user'] as Map<String, dynamic>? ?? data;
-        return UserModel.fromJson(userData);
-      } else {
-        throw ServerException(
-          message: response.data?['message'] as String? ?? 'Registration failed',
-          statusCode: response.statusCode,
-        );
+      final user = credential.user;
+      if (user == null) {
+        throw const ServerException(message: 'Registration failed');
       }
-    } on DioException catch (e) {
-      throw _handleDioException(e);
+
+      // Update display name
+      await user.updateDisplayName(fullName);
+
+      return UserModel(
+        id: user.uid,
+        email: user.email ?? '',
+        fullName: fullName,
+      );
+    } on FirebaseAuthException catch (e) {
+      throw _handleFirebaseAuthException(e);
     }
   }
 
-  /// Logs out the current user by invalidating the session on the server.
+  /// Logs out the current user.
   Future<void> logout() async {
     try {
-      await _dio.post('/auth/logout');
-    } on DioException catch (e) {
-      throw _handleDioException(e);
+      await _firebaseAuth.signOut();
+    } on FirebaseAuthException catch (e) {
+      throw _handleFirebaseAuthException(e);
     }
   }
 
   /// Fetches the currently authenticated user's profile.
-  Future<UserModel> getCurrentUser() async {
-    try {
-      final response = await _dio.get('/auth/me');
-
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        final userData = data['user'] as Map<String, dynamic>? ?? data;
-        return UserModel.fromJson(userData);
-      } else {
-        throw ServerException(
-          message: response.data?['message'] as String? ?? 'Failed to get user',
-          statusCode: response.statusCode,
-        );
-      }
-    } on DioException catch (e) {
-      throw _handleDioException(e);
+  ///
+  /// Returns `null` if no user is signed in.
+  Future<UserModel?> getCurrentUser() async {
+    // currentUser is synchronous and never throws FirebaseAuthException
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      return null;
     }
+
+    return UserModel(
+      id: user.uid,
+      email: user.email ?? '',
+      fullName: user.displayName ?? 'User',
+    );
   }
 
-  /// Handles [DioException] and converts it to a [ServerException].
-  ServerException _handleDioException(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
+  /// Handles [FirebaseAuthException] and converts it to a [ServerException].
+  ServerException _handleFirebaseAuthException(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
         return const ServerException(
-          message: 'Connection timed out. Please try again.',
-          statusCode: 408,
+          message: 'No account found with this email address',
+          statusCode: 404,
         );
-      case DioExceptionType.badResponse:
-        final statusCode = e.response?.statusCode;
-        final message = e.response?.data is Map<String, dynamic>
-            ? (e.response!.data as Map<String, dynamic>)['message'] as String?
-            : null;
-        return ServerException(
-          message: message ?? 'Server error occurred',
-          statusCode: statusCode,
-        );
-      case DioExceptionType.cancel:
+      case 'wrong-password':
         return const ServerException(
-          message: 'Request was cancelled',
-          statusCode: 499,
+          message: 'Incorrect password. Please try again.',
+          statusCode: 401,
         );
-      case DioExceptionType.connectionError:
+      case 'email-already-in-use':
         return const ServerException(
-          message: 'No internet connection',
+          message: 'This email is already registered. Please sign in.',
+          statusCode: 409,
+        );
+      case 'weak-password':
+        return const ServerException(
+          message: 'Password is too weak. Please use at least 6 characters.',
+          statusCode: 400,
+        );
+      case 'invalid-email':
+        return const ServerException(
+          message: 'Invalid email address format.',
+          statusCode: 400,
+        );
+      case 'user-disabled':
+        return const ServerException(
+          message: 'This account has been disabled.',
+          statusCode: 403,
+        );
+      case 'network-request-failed':
+        return const ServerException(
+          message: 'No internet connection. Please check your network.',
           statusCode: 503,
         );
       default:
-        return const ServerException(
-          message: 'An unexpected error occurred',
+        return ServerException(
+          message: e.message ?? 'An unexpected authentication error occurred',
           statusCode: 500,
         );
     }

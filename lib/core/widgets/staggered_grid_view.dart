@@ -53,7 +53,8 @@ class _StaggeredGridViewState extends State<StaggeredGridView>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: widget.animationDuration +
+      duration:
+          widget.animationDuration +
           Duration(
             milliseconds: (widget.itemCount * widget.staggerDelayMilliseconds)
                 .toInt(),

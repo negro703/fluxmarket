@@ -11,10 +11,7 @@ abstract class AppException implements Exception {
 
 /// Exception thrown when a server/API request fails.
 class ServerException extends AppException {
-  const ServerException({
-    required super.message,
-    super.statusCode,
-  });
+  const ServerException({required super.message, super.statusCode});
 
   /// Creates a [ServerException] from a Dio error response.
   factory ServerException.fromDioError({
@@ -31,10 +28,7 @@ class ServerException extends AppException {
 
 /// Exception thrown when a local cache/storage operation fails.
 class CacheException extends AppException {
-  const CacheException({
-    required super.message,
-    super.statusCode,
-  });
+  const CacheException({required super.message, super.statusCode});
 }
 
 /// Exception thrown when there is no network connectivity.

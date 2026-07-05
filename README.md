@@ -13,11 +13,11 @@
 ## 📑 Table of Contents
 
 - [Architecture Overview](#-architecture-overview)
-- [Tech Stack](#-tech-stack)
+- [Tech Stack & Architecture](#-tech-stack--architecture)
 - [Project Structure](#-project-structure)
 - [Features](#-features)
 - [Screenshots](#-screenshots)
-- [Getting Started](#-getting-started)
+- [How to Run](#-how-to-run)
 - [Code Quality & Conventions](#-code-quality--conventions)
 - [Animations & UX](#-animations--ux)
 - [Testing](#-testing)
@@ -37,14 +37,14 @@
 │   (BLoC / UI / Pages / Widgets)                │
 │         ↕ depends on                           │
 ├─────────────────────────────────────────────────┤
-│                    DOMAIN                       │
-│   (Entities / Use Cases / Repositories)        │
+│                    DOMAIN                         │
+│   (Entities / Use Cases / Repositories)          │
 │         ↕ depends on                           │
 ├─────────────────────────────────────────────────┤
 │                     DATA                        │
-│   (DataSources / Models / Repository Impl)     │
+│   (DataSources / Models / Repository Impl)      │
 │         ↕                                      │
-│   🌐 Remote (Dio)       💾 Local (Hive)       │
+│   🌐 Remote (Dio)       💾 Local (Hive)        │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -56,17 +56,17 @@
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Tech Stack & Architecture
 
-| Category | Choice | Why |
-|----------|--------|-----|
-| **Framework** | Flutter 3.12+ | Cross-platform, native performance |
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **Framework** | Flutter 3.12+ | Cross-platform mobile development |
 | **Language** | Dart 3.12+ | Sound null safety, pattern matching |
-| **State Management** | flutter_bloc 9.x | Predictable, testable, event-driven |
-| **Dependency Injection** | get_it + injectable | Compile-time safe, auto-generated |
-| **Networking** | Dio 5.x | Interceptors, retry, timeout handling |
-| **Local Storage** | Hive 2.x | Fast, lightweight, NoSQL |
-| **Routing** | Navigator 2.0 (MaterialPageRoute) | Simple, declarative |
+| **State Management** | flutter_bloc 9.x | Predictable, testable state management |
+| **Dependency Injection** | get_it + injectable | Compile-time safe DI |
+| **Networking** | Dio 5.x | HTTP client with interceptors & retry |
+| **Local Storage** | Hive 2.x | Fast NoSQL database for caching |
+| **Routing** | MaterialPageRoute | Simple, declarative navigation |
 | **Animation** | Lottie + Flutter Animations | Rich, performant animations |
 | **Error Handling** | dartz (Either) | Functional, type-safe error handling |
 | **UI Components** | google_fonts, shimmer | Beautiful, modern UI |
@@ -89,14 +89,14 @@ lib/
 │   │   └── constants.dart          # App-wide constants
 │   └── widgets/                    # Reusable global widgets
 │       ├── app_error_widget.dart   # Global error display widget
-│       ├── snack_message.dart      # Snackbar helper (success/error/warning/info)
-│       └── staggered_grid_view.dart# Staggered fade-in/slide-up grid animation
+│       ├── snack_message.dart      # Snackbar helper
+│       └── staggered_grid_view.dart# Staggered animation grid
 │
 ├── features/                       # Feature modules
 │   ├── auth/                       # Authentication feature
 │   │   ├── data/
 │   │   │   ├── datasources/        # Remote & local auth data sources
-│   │   │   ├── models/             # Auth model (JSON serializable)
+│   │   │   ├── models/             # Auth model
 │   │   │   └── repositories/       # Auth repository implementation
 │   │   ├── domain/
 │   │   │   ├── entities/           # User entity
@@ -120,18 +120,44 @@ lib/
 │   │       ├── pages/              # Home, Product Detail pages
 │   │       └── widgets/            # ProductCard, shimmer, grid
 │   │
-│   └── cart/                       # Shopping Cart feature
+│   ├── cart/                       # Shopping Cart feature
+│   │   ├── data/
+│   │   │   ├── datasources/        # Hive local data source
+│   │   │   ├── models/             # Cart item model
+│   │   │   └── repositories/       # Cart repository implementation
+│   │   ├── domain/
+│   │   │   ├── entities/           # Cart item entity
+│   │   │   ├── repositories/       # Cart repository abstract class
+│   │   │   └── usecases/           # Add/Remove/Get/Clear cart
+│   │   └── presentation/
+│   │       ├── bloc/               # CartBloc (event → state)
+│   │       └── pages/              # Cart page
+│   │
+│   ├── checkout/                   # Checkout & Orders feature
+│   │   ├── data/
+│   │   │   ├── datasources/        # Order history data source
+│   │   │   ├── models/             # Order model
+│   │   │   └── repositories/       # Order repository implementation
+│   │   ├── domain/
+│   │   │   ├── entities/           # Order entity
+│   │   │   ├── repositories/       # Order repository abstract class
+│   │   │   └── usecases/           # Place order, get orders
+│   │   └── presentation/
+│   │       ├── bloc/               # CheckoutBloc (event → state)
+│   │       └── pages/              # Checkout page, Order history
+│   │
+│   └── profile/                    # User Profile feature
 │       ├── data/
-│       │   ├── datasources/        # Hive local data source
-│       │   ├── models/             # Cart item model
-│       │   └── repositories/       # Cart repository implementation
+│       │   ├── datasources/
+│       │   ├── models/
+│       │   └── repositories/
 │       ├── domain/
-│       │   ├── entities/           # Cart item entity
-│       │   ├── repositories/       # Cart repository abstract class
-│       │   └── usecases/           # Add/Remove/Get/Clear cart
+│       │   ├── entities/
+│       │   ├── repositories/
+│       │   └── usecases/
 │       └── presentation/
-│           ├── bloc/               # CartBloc (event → state)
-│           └── pages/              # Cart page with Lottie empty state
+│           ├── bloc/
+│           └── pages/
 │
 ├── injection_container.dart        # GetIt DI configuration
 └── main.dart                       # App entry point
@@ -145,8 +171,11 @@ lib/
 
 - **User Authentication** — Login & registration with form validation
 - **Product Catalog** — Browse products in a responsive grid with shimmer loading
+- **Product Search & Filtering** — Real-time search with debounce, filter by name/category/description
 - **Product Detail** — Full product info with Hero image transition & animated "Add to Cart"
 - **Shopping Cart** — Manage items, quantities, order summary, with Lottie empty-state animation
+- **Checkout Flow** — Delivery details collection with mock payment processing
+- **Order History** — Track completed orders persisted locally with Hive
 - **Responsive Grid** — Adapts columns (2/3/4) based on screen width
 - **Staggered Animations** — Cascading fade-in + slide-up for product grid items
 - **Scale Animation** — Press-feedback animation on the "Add to Cart" button
@@ -160,26 +189,24 @@ lib/
 
 ### 🔜 Planned
 
-- [ ] Checkout flow (payment integration)
-- [ ] User profile & order history
-- [ ] Product search & filtering
-- [ ] Push notifications
-- [ ] Unit & widget tests
-- [ ] CI/CD pipeline
+- Push notifications
+- CI/CD with GitHub Actions
+- Unit & widget tests
+- Firebase backend integration
 
 ---
 
 ## 📸 Screenshots
 
-> *Coming soon — Generate screenshots from the running app.*
+> *Generate screenshots from the running app.*
 
 | Home Page | Product Detail | Cart Page | Cart Empty |
 |-----------|---------------|-----------|------------|
-| *Grid with staggered animations* | *Hero image + scale button* | *Items & order summary* | *Lottie animation* |
+| *Grid with staggered animations & search* | *Hero image + scale button* | *Items & order summary* | *Lottie animation* |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 How to Run
 
 ### Prerequisites
 
@@ -197,11 +224,27 @@ cd fluxmarket
 # Install dependencies
 flutter pub get
 
-# Generate code (injectable, freezed)
+# Generate code (injectable, freezed - if applicable)
 dart run build_runner build --delete-conflicting-outputs
 
 # Run the app
 flutter run
+```
+
+### Run on Specific Platform
+
+```bash
+# Android
+flutter run -d android
+
+# iOS (requires macOS)
+flutter run -d ios
+
+# Web
+flutter run -d chrome
+
+# Windows
+flutter run -d windows
 ```
 
 ### Build for Production
@@ -210,11 +253,26 @@ flutter run
 # Android APK
 flutter build apk --release
 
+# Android App Bundle
+flutter build appbundle --release
+
 # iOS (requires macOS)
 flutter build ios --release
 
 # Web
 flutter build web --release
+```
+
+### Run Tests
+
+```bash
+# Run all tests
+flutter test
+
+# Run with coverage
+flutter test --coverage
+genhtml coverage/lcov.info -o coverage/html
+open coverage/html/index.html
 ```
 
 ---
@@ -254,11 +312,11 @@ flutter build web --release
 
 | Animation | Location | Implementation |
 |-----------|----------|----------------|
-| **Staggered Grid** | HomePage product grid | `StaggeredGridView` — sequential fade-in + slide-up with configurable delay |
-| **Scale Button** | ProductDetailPage "Add to Cart" | `AnimationController` with `Tween(1.0 → 0.95)` for tactile feedback |
-| **Lottie Empty Cart** | CartPage empty state | `Lottie.asset` with looping `empty_cart.json` animation |
-| **Hero** | ProductCard → ProductDetailPage | Flutter's built-in `Hero` widget for smooth image transitions |
-| **Shimmer Loading** | HomePage initial load | `shimmer` package with skeleton grid placeholders |
+| **Staggered Grid** | HomePage product grid | `StaggeredGridView` — sequential fade-in + slide-up |
+| **Scale Button** | ProductDetailPage "Add to Cart" | `AnimationController` with scale transform |
+| **Bounce Empty Cart** | CartPage empty state | `AnimationController` with bounce effect |
+| **Hero** | ProductCard → ProductDetailPage | Flutter's built-in `Hero` widget |
+| **Shimmer Loading** | HomePage initial load | `shimmer` package with skeleton placeholders |
 
 ---
 
@@ -270,8 +328,6 @@ flutter test
 
 # Run with coverage
 flutter test --coverage
-genhtml coverage/lcov.info -o coverage/html
-open coverage/html/index.html
 ```
 
 ### Test Strategy
@@ -284,19 +340,21 @@ open coverage/html/index.html
 
 ## 🗺 Roadmap
 
-- [x] Project scaffolding & architecture setup
-- [x] Core layer (networking, theme, error handling)
-- [x] Authentication feature (login/register)
-- [x] Product catalog & detail pages
-- [x] Shopping cart with Hive persistence
-- [x] Animations & UI polish
-- [ ] Checkout & payment integration
-- [ ] User profile management
-- [ ] Order history tracking
-- [ ] Product search & filtering
-- [ ] Push notifications
-- [ ] CI/CD with GitHub Actions
-- [ ] Comprehensive test suite
+| Status | Milestone |
+|--------|-----------|
+| ✅ | Project scaffolding & architecture setup |
+| ✅ | Core layer (networking, theme, error handling) |
+| ✅ | Authentication feature (login/register) |
+| ✅ | Product catalog & detail pages |
+| ✅ | Product search & filtering |
+| ✅ | Shopping cart with Hive persistence |
+| ✅ | Animations & UI polish |
+| ✅ | Checkout & order simulation (mock payment) |
+| ✅ | Order history tracking |
+| ⏳ | Push notifications |
+| ⏳ | CI/CD with GitHub Actions |
+| ⏳ | Comprehensive test suite |
+| ⏳ | Firebase backend integration |
 
 ---
 

@@ -13,8 +13,7 @@ class ProductGridShimmer extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
-    final highlightColor =
-        isDark ? Colors.grey.shade700 : Colors.grey.shade100;
+    final highlightColor = isDark ? Colors.grey.shade700 : Colors.grey.shade100;
 
     return Shimmer.fromColors(
       baseColor: baseColor,

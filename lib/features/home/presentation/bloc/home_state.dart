@@ -14,12 +14,9 @@ sealed class HomeState with _$HomeState {
   const factory HomeState.loading() = HomeLoading;
 
   /// State emitted when products are loaded successfully.
-  const factory HomeState.loaded({
-    required List<ProductEntity> products,
-  }) = HomeLoaded;
+  const factory HomeState.loaded({required List<ProductEntity> products}) =
+      HomeLoaded;
 
   /// State emitted when an error occurs during fetching.
-  const factory HomeState.error({
-    required String message,
-  }) = HomeError;
+  const factory HomeState.error({required String message}) = HomeError;
 }

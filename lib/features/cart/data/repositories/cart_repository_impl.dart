@@ -56,7 +56,7 @@ class CartRepositoryImpl implements CartRepository {
     }
   }
 
-@override
+  @override
   Future<Either<Failure, List<CartItemEntity>>> decrementQuantity({
     required int productId,
   }) async {
