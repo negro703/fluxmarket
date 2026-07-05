@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../../cart/presentation/bloc/cart_event.dart';
-import '../../../home/presentation/pages/home_page.dart';
+import '../../../../core/widgets/main_shell.dart';
+import 'order_history_page.dart';
 
 /// Page shown after a successful order placement.
 class OrderSuccessPage extends StatelessWidget {
@@ -83,10 +84,9 @@ class OrderSuccessPage extends StatelessWidget {
                     onPressed: () {
                       // Clear the cart after successful order
                       context.read<CartBloc>().add(const ClearCartEvent());
-                      // Navigate to home and clear stack
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => const HomePage()),
-                        (route) => false,
+                      // Navigate to MainShell to preserve the bottom navigation bar
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const MainShell()),
                       );
                     },
                     icon: const Icon(Icons.shopping_bag_rounded),
@@ -106,8 +106,10 @@ class OrderSuccessPage extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      // Navigate to order history
-                      Navigator.of(context).pop();
+                      // Navigate to order history page
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const OrderHistoryPage()),
+                      );
                     },
                     icon: const Icon(Icons.history_rounded),
                     label: const Text('View My Orders'),

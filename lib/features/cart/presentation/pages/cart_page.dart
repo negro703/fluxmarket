@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/widgets/app_error_widget.dart';
+import '../../../../core/widgets/main_shell.dart';
 import '../../../checkout/presentation/bloc/checkout_bloc.dart';
 import '../../../checkout/presentation/bloc/checkout_event.dart';
 import '../../../checkout/presentation/pages/cash_on_delivery_page.dart';
-import '../../../home/presentation/pages/home_page.dart';
 import '../../domain/entities/cart_item_entity.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_event.dart';
@@ -183,9 +183,9 @@ class _CartEmptyViewState extends State<_CartEmptyView>
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                // Navigate to HomePage using pushReplacement to clear navigation stack
+                // Navigate to MainShell to preserve the bottom navigation bar
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const HomePage()),
+                  MaterialPageRoute(builder: (_) => const MainShell()),
                 );
               },
               icon: const Icon(Icons.explore_rounded),
