@@ -198,11 +198,7 @@ lib/
 
 ## 📸 Screenshots
 
-> *Generate screenshots from the running app.*
-
-| Home Page | Product Detail | Cart Page | Cart Empty |
-|-----------|---------------|-----------|------------|
-| *Grid with staggered animations & search* | *Hero image + scale button* | *Items & order summary* | *Lottie animation* |
+![FluxMarket App UI](lib/screenshots/fluxUI.jpeg)
 
 ---
 
@@ -218,7 +214,7 @@ lib/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/fluxmarket.git
+git clone https://github.com/negro703/fluxmarket
 cd fluxmarket
 
 # Install dependencies
@@ -351,10 +347,7 @@ flutter test --coverage
 | ✅ | Animations & UI polish |
 | ✅ | Checkout & order simulation (mock payment) |
 | ✅ | Order history tracking |
-| ⏳ | Push notifications |
-| ⏳ | CI/CD with GitHub Actions |
-| ⏳ | Comprehensive test suite |
-| ⏳ | Firebase backend integration |
+| ✅ | Firebase backend integration |
 
 ---
 
@@ -396,5 +389,5 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 ---
 
 <p align="center">
-  Made with ❤️ using Flutter & Clean Architecture
+  Made with ❤️ by Ahmed Mohamed Abdelfattah using Flutter & Clean Architecture
 </p>
