@@ -386,8 +386,3 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 - [Flutter](https://flutter.dev) team at Google
 - All open-source packages used in this project
 
----
-
-<p align="center">
-  Made with ❤️ by Ahmed Mohamed Abdelfattah using Flutter & Clean Architecture
-</p>
